@@ -1,4 +1,4 @@
-module github.com/yoru0/gochi.git
+module github.com/yoru0/goapi.git
 
 go 1.24.3
 
