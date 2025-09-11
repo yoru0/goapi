@@ -14,43 +14,79 @@ type UserCreateRequestParam struct {
 }
 
 type UserCreateResponseParam struct {
-	Success   bool   `json:"success"`
-	Message   string `json:"message"`
-	ID        int64  `json:"id"`
-	Name      string `json:"name"`
-	Email     string `json:"email"`
-	CreatedAt string `json:"created_at"`
+	Success bool         `json:"success"`
+	Message string       `json:"message"`
+	Data    *models.User `json:"data,omitempty"`
+	Error   string       `json:"error,omitempty"`
 }
 
+// UserCreate handles POST /api/v1/users/create - Create a new user.
 func (h *UserHandler) UserCreate(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	var req UserCreateRequestParam
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		response := UserCreateResponseParam{
+			Success: false,
+			Error:   "Invalid JSON format",
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(response)
 		return
 	}
 
 	if req.Name == "" {
-		http.Error(w, "Name is required", http.StatusBadRequest)
+		response := UserCreateResponseParam{
+			Success: false,
+			Error:   "Name is required",
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(response)
 		return
 	}
 	if req.Email == "" {
-		http.Error(w, "Email is required", http.StatusBadRequest)
+		response := UserCreateResponseParam{
+			Success: false,
+			Error:   "Email is required",
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(response)
 		return
 	}
 	if len(req.Email) < 5 || !containsAt(req.Email) {
-		http.Error(w, "Invalid email format", http.StatusBadRequest)
+		response := UserCreateResponseParam{
+			Success: false,
+			Error:   "Invalid email format",
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	req.Name = trimWhitespace(req.Name)
+	req.Email = trimWhitespace(req.Email)
+
+	if req.Name == "" {
+		response := UserCreateResponseParam{
+			Success: false,
+			Error:   "Name cannot be empty or just spaces",
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(response)
 		return
 	}
 
 	for _, user := range h.users {
 		if user.Email == req.Email {
-			http.Error(w, "Email already exists", http.StatusConflict)
+			response := UserCreateResponseParam{
+				Success: false,
+				Error:   "Email already exists",
+			}
+			w.WriteHeader(http.StatusConflict)
+			json.NewEncoder(w).Encode(response)
 			return
 		}
 	}
-
-	req.Name = trimWhitespace(req.Name)
-	req.Email = trimWhitespace(req.Email)
 
 	user := models.User{
 		ID:        h.nextID,
@@ -62,9 +98,14 @@ func (h *UserHandler) UserCreate(w http.ResponseWriter, r *http.Request) {
 	h.users = append(h.users, user)
 	h.nextID++
 
-	w.Header().Set("Content-Type", "application/json")
+	response := UserCreateResponseParam{
+		Success: true,
+		Message: "User created successfully",
+		Data:    &user,
+	}
+
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(user)
+	json.NewEncoder(w).Encode(response)
 }
 
 func trimWhitespace(s string) string {
