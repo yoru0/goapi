@@ -8,10 +8,12 @@ import (
 	"github.com/yoru0/goapi.git/internal/pkg/common/constant/httpstatus"
 )
 
+// RequestParam is an interface for request parameters that require validation.
 type RequestParam interface {
 	Validate() (msg, field string)
 }
 
+// DecodeBodyJSON decodes the JSON body into the provided struct.
 func DecodeBodyJSON(w http.ResponseWriter, r *http.Request, v RequestParam) (ok bool) {
 	if err := json.NewDecoder(r.Body).Decode(v); err != nil {
 		log.Println(err.Error())

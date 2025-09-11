@@ -25,6 +25,7 @@ type ResponseError struct {
 // ResponseData is the payload data to be returned for an API request.
 type ResponseData struct{}
 
+// NewAPIResponse creates a new API response with default values.
 func NewAPIResponse() *Response {
 	return &Response{
 		Status: httpstatus.OK,
@@ -33,6 +34,7 @@ func NewAPIResponse() *Response {
 	}
 }
 
+// NewAPIResponseWithError creates a new API response with an error.
 func NewAPIResponseWithError(code, msg string) *Response {
 	return &Response{
 		Status: httpstatus.OK,
@@ -41,6 +43,7 @@ func NewAPIResponseWithError(code, msg string) *Response {
 	}
 }
 
+// NewAPIResponseWithErrorField creates a new API response with an error and a field.
 func NewAPIResponseWithErrorField(code, msg, field string) *Response {
 	return &Response{
 		Status: httpstatus.OK,
@@ -49,6 +52,7 @@ func NewAPIResponseWithErrorField(code, msg, field string) *Response {
 	}
 }
 
+// SendResponseJSON sends the API response as JSON.
 func SendResponseJSON(w http.ResponseWriter, r *Response) error {
 	w.Header().Set("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(r)
@@ -58,6 +62,7 @@ func SendResponseJSON(w http.ResponseWriter, r *Response) error {
 	return err
 }
 
+// SendResponseJSONWithStatusCode sends the API response as JSON with a specific HTTP status code.
 func SendResponseJSONWithStatusCode(w http.ResponseWriter, r *Response, statusCode int) error {
 	w.Header().Set("Content-Type", "application/json")
 	r.Status = statusCode
