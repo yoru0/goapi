@@ -17,6 +17,7 @@ func main() {
 		r.Route("/users", func(r chi.Router) {
 			r.Post("/create", handlers.UserCreate)
 			r.Post("/list", handlers.UserList)
+			r.Post("/get", handlers.UserGet)
 		})
 	})
 
