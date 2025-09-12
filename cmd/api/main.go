@@ -19,6 +19,7 @@ func main() {
 			r.Post("/list", handlers.UserList)
 			r.Post("/get", handlers.UserGet)
 			r.Post("/update", handlers.UserUpdate)
+			r.Post("/delete", handlers.UserDelete)
 		})
 	})
 
