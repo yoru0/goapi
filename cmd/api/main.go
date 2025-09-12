@@ -18,6 +18,7 @@ func main() {
 			r.Post("/create", handlers.UserCreate)
 			r.Post("/list", handlers.UserList)
 			r.Post("/get", handlers.UserGet)
+			r.Post("/update", handlers.UserUpdate)
 		})
 	})
 
