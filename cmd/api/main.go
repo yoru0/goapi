@@ -16,6 +16,7 @@ func main() {
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Route("/users", func(r chi.Router) {
 			r.Post("/create", handlers.UserCreate)
+			r.Post("/list", handlers.UserList)
 		})
 	})
 
